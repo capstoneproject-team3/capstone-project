@@ -5,7 +5,7 @@ S1G3
 
 ## Group Members
 - Harshitha Merlin Raviprasad
-- 
+- Prince Patel
 
 *(Each member must commit their name locally as per rubric)*
 
