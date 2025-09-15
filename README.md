@@ -4,7 +4,7 @@
 S1G3
 
 ## Group Members
-- Harshitha Raviprasad
+- Harshitha Merlin Raviprasad
 - 
 
 *(Each member must commit their name locally as per rubric)*
