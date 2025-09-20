@@ -21,7 +21,7 @@ A comprehensive mobile/web app that helps users manage their personal finances e
 
 ## Data Source
 **Type:** Single-user input (Easy)  
-**Description:** All data is entered and stored locally for the user. Transactions, budgets, goals, and bills are maintained within the app.  
+**Description:** All data is entered and stored locally for the user. Transactions, budgets, goals and bills are maintained within the app.  
 
 ---
 
