@@ -27,14 +27,14 @@ A comprehensive mobile/web app that helps users manage their personal finances e
 
 ## Features
 
-- Users can add, edit, and delete income and expense transactions.  
-- Users can import transactions from CSV files.  
-- Users can categorize transactions with smart categories and icons.  
-- Users can set budgets and track spending per category.  
-- Users can view interactive charts of spending trends over time.  
-- Users can receive reminders for recurring bills.  
-- Users can set financial goals and track progress.  
-- Users can generate detailed monthly, quarterly, and yearly reports.  
+user can add and view expense
+user can edit and delete expense 
+user can categorize each expense 
+user can set budget and track spending per category
+user can set overall financial goal and track progress
+user can receive reminders for recurring bills
+users can generate detailed monthly, quarterly, and yearly reports
+user can change app’s theme to dark mode
 
 ---
 
