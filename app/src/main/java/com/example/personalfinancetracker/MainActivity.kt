@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeData() {
         viewModel.getCurrentMonthExpenses().observe(this) { expenses ->
-            // Update recent transactions (show last 5)
+              // Update recent transactions (show last 5)
             expenseAdapter.updateExpenses(expenses.take(5))
 
             // Calculate and display totals
