@@ -58,8 +58,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupFAB() {
         val fab = findViewById<FloatingActionButton>(R.id.fabAddExpense)
         fab.setOnClickListener {
-            // TODO: Open Add Expense Activity
-            // For now, let's add sample expenses
+
             addSampleExpenses()
         }
     }
