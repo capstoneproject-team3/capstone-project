@@ -14,7 +14,7 @@ class CategoryAdapter(
     private var categories: Map<String, Double>
 ) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
-    private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "IN"))
+    private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "CA"))
     private var categoryList = categories.toList().sortedByDescending { it.second }.take(5)
 
     class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

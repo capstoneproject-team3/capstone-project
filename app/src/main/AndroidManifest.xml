@@ -21,6 +21,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Add this new activity -->
+        <activity
+            android:name=".AddExpenseActivity"
+            android:label="Add Transaction"
+            android:parentActivityName=".MainActivity">
+        </activity>
+
     </application>
 
 </manifest>

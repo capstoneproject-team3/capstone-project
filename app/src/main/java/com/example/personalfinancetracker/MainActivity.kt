@@ -1,12 +1,14 @@
 package com.example.personalfinancetracker
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.WindowInsetsController
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.personalfinancetracker.data.entity.Expense
 import com.example.personalfinancetracker.data.entity.TransactionType
 import com.example.personalfinancetracker.ui.home.CategoryAdapter
 import com.example.personalfinancetracker.ui.home.ExpenseAdapter
@@ -15,6 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import android.graphics.Color
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,12 +25,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var expenseAdapter: ExpenseAdapter
     private lateinit var categoryAdapter: CategoryAdapter
 
-    private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "IN"))
+    private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "CA"))
     private val monthFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Setup status bar - light icons for dark toolbar
+        setupStatusBar()
 
         // Initialize ViewModel
         viewModel = ViewModelProvider(this)[ExpenseViewModel::class.java]
@@ -37,6 +43,21 @@ class MainActivity : AppCompatActivity() {
         setupFAB()
         observeData()
         updateMonthDisplay()
+    }
+
+    private fun setupStatusBar() {
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            window.insetsController?.setSystemBarsAppearance(
+                0, // Light icons for dark toolbar
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = 0 // Clear light status bar flag
+        }
     }
 
     private fun setupRecyclerViews() {
@@ -58,15 +79,16 @@ class MainActivity : AppCompatActivity() {
     private fun setupFAB() {
         val fab = findViewById<FloatingActionButton>(R.id.fabAddExpense)
         fab.setOnClickListener {
-
-            addSampleExpenses()
+            // Open Add Expense Activity
+            val intent = Intent(this, AddExpenseActivity::class.java)
+            startActivity(intent)
         }
     }
 
     private fun observeData() {
         viewModel.getCurrentMonthExpenses().observe(this) { expenses ->
-              // Update recent transactions (show last 5)
-            expenseAdapter.updateExpenses(expenses.take(5))
+            // Update recent transactions (show all)
+            expenseAdapter.updateExpenses(expenses)
 
             // Calculate and display totals
             val totalExpense = viewModel.calculateTotal(expenses, TransactionType.EXPENSE)
@@ -85,62 +107,5 @@ class MainActivity : AppCompatActivity() {
     private fun updateMonthDisplay() {
         val currentDate = Date()
         findViewById<TextView>(R.id.tvCurrentMonth).text = monthFormat.format(currentDate)
-    }
-
-    // Temporary function to add sample data for testing
-    private fun addSampleExpenses() {
-        val sampleExpenses = listOf(
-            Expense(
-                expenseName = "Lunch at Restaurant",
-                amount = 450.0,
-                category = "Food",
-                date = System.currentTimeMillis(),
-                description = "Lunch with colleagues",
-                type = TransactionType.EXPENSE,
-                isRecurring = false
-            ),
-            Expense(
-                expenseName = "Uber Ride",
-                amount = 180.0,
-                category = "Transport",
-                date = System.currentTimeMillis() - 86400000, // Yesterday
-                description = "Ride to office",
-                type = TransactionType.EXPENSE,
-                isRecurring = false
-            ),
-            Expense(
-                expenseName = "Grocery Shopping",
-                amount = 2500.0,
-                category = "Shopping",
-                date = System.currentTimeMillis() - 172800000, // 2 days ago
-                description = "Weekly groceries",
-                type = TransactionType.EXPENSE,
-                isRecurring = false
-            ),
-            Expense(
-                expenseName = "Electricity Bill",
-                amount = 1200.0,
-                category = "Bills",
-                date = System.currentTimeMillis() - 259200000, // 3 days ago
-                description = "Monthly electricity",
-                type = TransactionType.EXPENSE,
-                isRecurring = true,
-                recurrencePeriod = com.example.personalfinancetracker.data.entity.RecurrencePeriod.MONTHLY
-            ),
-            Expense(
-                expenseName = "Salary",
-                amount = 50000.0,
-                category = "Salary",
-                date = System.currentTimeMillis() - 345600000, // 4 days ago
-                description = "Monthly salary",
-                type = TransactionType.INCOME,
-                isRecurring = true,
-                recurrencePeriod = com.example.personalfinancetracker.data.entity.RecurrencePeriod.MONTHLY
-            )
-        )
-
-        sampleExpenses.forEach { expense ->
-            viewModel.insert(expense)
-        }
     }
 }
