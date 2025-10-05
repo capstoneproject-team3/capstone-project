@@ -34,6 +34,7 @@ class AddExpenseActivity : AppCompatActivity() {
     private lateinit var cbIsRecurring: CheckBox
     private lateinit var tvRecurrenceLabel: TextView
     private lateinit var btnSave: MaterialButton
+    private lateinit var btnCancel: MaterialButton
 
     private var selectedDate: Calendar = Calendar.getInstance()
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -69,6 +70,7 @@ class AddExpenseActivity : AppCompatActivity() {
         setupRecurringCheckbox()
         setupTransactionTypeToggle()
         setupSaveButton()
+        setupCancelButton()
 
         // Set action bar
         supportActionBar?.title = "Add Transaction"
@@ -103,6 +105,7 @@ class AddExpenseActivity : AppCompatActivity() {
         cbIsRecurring = findViewById(R.id.cbIsRecurring)
         tvRecurrenceLabel = findViewById(R.id.tvRecurrenceLabel)
         btnSave = findViewById(R.id.btnSave)
+        btnCancel = findViewById(R.id.btnCancel)
 
         // Set default date
         etDate.setText(dateFormat.format(selectedDate.time))
@@ -168,6 +171,13 @@ class AddExpenseActivity : AppCompatActivity() {
     private fun setupSaveButton() {
         btnSave.setOnClickListener {
             saveExpense()
+        }
+    }
+
+    private fun setupCancelButton() {
+        btnCancel.setOnClickListener {
+            // Discard all input and return to MainActivity
+            finish()
         }
     }
 

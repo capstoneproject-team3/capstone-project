@@ -51,12 +51,12 @@ class MainActivity : AppCompatActivity() {
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             window.insetsController?.setSystemBarsAppearance(
-                0, // Light icons for dark toolbar
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, // Enable light status bar (dark icons)
                 WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
             )
         } else {
             @Suppress("DEPRECATION")
-            window.decorView.systemUiVisibility = 0 // Clear light status bar flag
+            window.decorView.systemUiVisibility = android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
     }
 
