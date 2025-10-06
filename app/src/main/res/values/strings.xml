@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Personal Finance Tracker</string>
+    <string-array name="recurrence_options">
+        <item>One-Time</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+        <item>Yearly</item>
+    </string-array>
 </resources>

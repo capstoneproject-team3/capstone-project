@@ -19,6 +19,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.graphics.Color
 
+// 👇 NEW IMPORTS FOR NOTIFICATION PERMISSION
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import android.widget.Toast
+// 👆 END NEW IMPORTS
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ExpenseViewModel
@@ -28,6 +37,17 @@ class MainActivity : AppCompatActivity() {
     private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "CA"))
     private val monthFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
 
+    // 👇 NEW: Register the permissions callback
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                Toast.makeText(this, "Notification permission granted. Reminders will work!", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "Notification permission denied. Reminders may not appear.", Toast.LENGTH_LONG).show()
+            }
+        }
+    // 👆 END NEW
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,15 +55,34 @@ class MainActivity : AppCompatActivity() {
         // Setup status bar - light icons for dark toolbar
         setupStatusBar()
 
+        // 👇 NEW: Check and request POST_NOTIFICATIONS permission
+        requestNotificationPermission()
+        // 👆 END NEW
+
         // Initialize ViewModel
         viewModel = ViewModelProvider(this)[ExpenseViewModel::class.java]
 
         // Setup UI
         setupRecyclerViews()
         setupFAB()
+        setupBillsButton() // Existing new function
+
         observeData()
         updateMonthDisplay()
     }
+
+    // 👇 NEW FUNCTION: Handle permission request for Android 13 (API 33) and above
+    private fun requestNotificationPermission() {
+        // Check if the device runs Android 13 (API 33) or higher
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Check if permission is NOT granted
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // Request the permission using the launcher
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+    // 👆 END NEW FUNCTION
 
     private fun setupStatusBar() {
         window.statusBarColor = android.graphics.Color.TRANSPARENT
@@ -75,6 +114,17 @@ class MainActivity : AppCompatActivity() {
         rvTopCategories.adapter = categoryAdapter
         rvTopCategories.layoutManager = LinearLayoutManager(this)
     }
+
+    private fun setupBillsButton() {
+        // Assuming you have added a Button with id 'btnBills' in activity_main.xml
+        val btnBills = findViewById<android.widget.Button>(R.id.btnBills)
+        btnBills.setOnClickListener {
+            // Open the new Bill List Activity
+            val intent = Intent(this, BillListActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
 
     private fun setupFAB() {
         val fab = findViewById<FloatingActionButton>(R.id.fabAddExpense)

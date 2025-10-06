@@ -39,7 +39,17 @@
             android:paddingEnd="16dp"
             android:paddingBottom="16dp">
 
-            <!-- Month Selector Card -->
+            <Button
+                android:id="@+id/btnBills"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginBottom="8dp"
+                android:text="Manage Bills"
+                android:textColor="?attr/colorPrimary"
+                app:icon="@drawable/ic_notifications"
+                tools:ignore="HardcodedText" />
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -98,7 +108,6 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Top Categories Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -130,7 +139,6 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Recent Transactions Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -166,7 +174,6 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Floating Action Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddExpense"
         android:layout_width="wrap_content"
