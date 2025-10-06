@@ -8,6 +8,10 @@ android {
     namespace = "com.example.personalfinancetracker"
     compileSdk = 36
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     defaultConfig {
         applicationId = "com.example.personalfinancetracker"
         minSdk = 24
@@ -46,6 +50,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
 
+    // 🚩 FIX: Activity KTX (Needed for 'by viewModels()' delegate)
+    implementation("androidx.activity:activity-ktx:1.9.0")
+
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
@@ -61,8 +68,12 @@ dependencies {
     // CoordinatorLayout
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
 
+    // ✅ NEW: WorkManager (Needed for ReminderWorker)
+    val work_version = "2.9.0"
+    implementation("androidx.work:work-runtime-ktx:$work_version")
+
     // Keep your existing dependencies below
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    // ... rest of your existing dependencies
+
 }
