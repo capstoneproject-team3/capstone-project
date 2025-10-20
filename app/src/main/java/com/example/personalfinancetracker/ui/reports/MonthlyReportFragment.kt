@@ -1,0 +1,70 @@
+package com.example.personalfinancetracker.ui.reports
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import com.example.personalfinancetracker.R
+import com.example.personalfinancetracker.databinding.FragmentReportDetailBinding
+import com.example.personalfinancetracker.viewmodel.ExpenseViewModel
+import java.text.NumberFormat
+import java.util.*
+
+class MonthlyReportFragment : Fragment() {
+
+    private var _binding: FragmentReportDetailBinding? = null
+    private val binding get() = _binding!!
+
+    // Use activityViewModels to get the ViewModel instance shared by the host ReportActivity
+    private val viewModel: ExpenseViewModel by activityViewModels()
+
+    private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "CA"))
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentReportDetailBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Observe the monthly expense data
+        viewModel.totalMonthlyExpense.observe(viewLifecycleOwner) { expense ->
+            val expenseValue = expense ?: 0.0
+            binding.tvTotalExpense.text = currencyFormat.format(expenseValue)
+            updateNet(expenseValue, viewModel.totalMonthlyIncome.value)
+        }
+
+        // Observe the monthly income data
+        viewModel.totalMonthlyIncome.observe(viewLifecycleOwner) { income ->
+            val incomeValue = income ?: 0.0
+            binding.tvTotalIncome.text = currencyFormat.format(incomeValue)
+            updateNet(viewModel.totalMonthlyExpense.value, incomeValue)
+        }
+    }
+
+    private fun updateNet(expense: Double?, income: Double?) {
+        val totalExpense = expense ?: 0.0
+        val totalIncome = income ?: 0.0
+        val net = totalIncome - totalExpense
+
+        binding.tvNetBalance.text = currencyFormat.format(net)
+
+        // Update color based on balance
+        val colorResId = if (net >= 0) android.R.color.holo_green_dark else android.R.color.holo_red_dark
+        binding.tvNetBalance.setTextColor(
+            ContextCompat.getColor(requireContext(), colorResId)
+        )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}

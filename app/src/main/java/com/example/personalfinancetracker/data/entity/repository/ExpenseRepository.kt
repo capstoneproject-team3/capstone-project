@@ -27,4 +27,10 @@ class ExpenseRepository(private val expenseDao: ExpenseDao) {
     fun getExpensesByDateRange(startDate: Long, endDate: Long): LiveData<List<Expense>> {
         return expenseDao.getExpensesByDateRange(startDate, endDate)
     }
+
+    // 👇 NEW FOR REPORTING: Expose the DAO's total amount calculation
+    fun getTotalAmountByDateRange(startDate: Long, endDate: Long, transactionType: String): LiveData<Double?> {
+        return expenseDao.getTotalAmountByDateRange(startDate, endDate, transactionType)
+    }
+    // 👆 END NEW
 }

@@ -50,8 +50,13 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
 
-    // 🚩 FIX: Activity KTX (Needed for 'by viewModels()' delegate)
+    // FIX: Activity KTX (Needed for 'by viewModels()' delegate)
     implementation("androidx.activity:activity-ktx:1.9.0")
+
+    // 👇 NEW SPRINT 2 DEPENDENCIES FOR REPORTING UI
+    implementation("androidx.fragment:fragment-ktx:1.6.2") // For Fragment support and KTX extensions
+    implementation("androidx.viewpager2:viewpager2:1.0.0") // For swiping between reports
+    // 👆 END NEW
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
@@ -68,7 +73,7 @@ dependencies {
     // CoordinatorLayout
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
 
-    // ✅ NEW: WorkManager (Needed for ReminderWorker)
+    // NEW: WorkManager (Needed for ReminderWorker)
     val work_version = "2.9.0"
     implementation("androidx.work:work-runtime-ktx:$work_version")
 

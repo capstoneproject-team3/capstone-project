@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
     private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "CA"))
     private val monthFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
 
-    // 👇 NEW: Register the permissions callback
+    //Register the permissions callback
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Notification permission denied. Reminders may not appear.", Toast.LENGTH_LONG).show()
             }
         }
-    // 👆 END NEW
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,9 +54,9 @@ class MainActivity : AppCompatActivity() {
         // Setup status bar - light icons for dark toolbar
         setupStatusBar()
 
-        // 👇 NEW: Check and request POST_NOTIFICATIONS permission
+        //Check and request POST_NOTIFICATIONS permission
         requestNotificationPermission()
-        // 👆 END NEW
+
 
         // Initialize ViewModel
         viewModel = ViewModelProvider(this)[ExpenseViewModel::class.java]
@@ -66,12 +65,13 @@ class MainActivity : AppCompatActivity() {
         setupRecyclerViews()
         setupFAB()
         setupBillsButton() // Existing new function
+        setupReportsButton()
 
         observeData()
         updateMonthDisplay()
     }
 
-    // 👇 NEW FUNCTION: Handle permission request for Android 13 (API 33) and above
+    // Handle permission request for Android 13 (API 33) and above
     private fun requestNotificationPermission() {
         // Check if the device runs Android 13 (API 33) or higher
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    // 👆 END NEW FUNCTION
+
 
     private fun setupStatusBar() {
         window.statusBarColor = android.graphics.Color.TRANSPARENT
@@ -114,6 +114,18 @@ class MainActivity : AppCompatActivity() {
         rvTopCategories.adapter = categoryAdapter
         rvTopCategories.layoutManager = LinearLayoutManager(this)
     }
+
+    //Setup Reports Button
+    private fun setupReportsButton() {
+        // Assuming you have added a Button with id 'btnReports' in activity_main.xml
+        val btnReports = findViewById<android.widget.Button>(R.id.btnReports)
+        btnReports.setOnClickListener {
+            // Open the new Report Activity
+            val intent = Intent(this, ReportActivity::class.java) // Launch the new ReportActivity
+            startActivity(intent)
+        }
+    }
+
 
     private fun setupBillsButton() {
         // Assuming you have added a Button with id 'btnBills' in activity_main.xml

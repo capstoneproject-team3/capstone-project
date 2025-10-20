@@ -64,8 +64,6 @@ class AddBillActivity : AppCompatActivity() {
                     // Update date components
                     billDueDate.set(selectedYear, selectedMonth, selectedDay)
 
-                    // 🚩 CRITICAL FIX: Reset time components to 0 on date selection
-                    // The time picker will set the exact time later.
                     billDueDate.set(Calendar.HOUR_OF_DAY, 0)
                     billDueDate.set(Calendar.MINUTE, 0)
                     billDueDate.set(Calendar.SECOND, 0)
@@ -103,7 +101,6 @@ class AddBillActivity : AppCompatActivity() {
             saveBillAndScheduleReminder()
         }
 
-        // 🚩 CANCEL BUTTON FIX: Closes the activity
         binding.btnCancel.setOnClickListener {
             finish()
         }
