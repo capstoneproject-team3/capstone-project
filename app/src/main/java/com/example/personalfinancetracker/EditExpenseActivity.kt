@@ -16,10 +16,8 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import java.text.SimpleDateFormat
 import java.util.*
-import android.graphics.Color
 
-
-class AddExpenseActivity : AppCompatActivity() {
+class EditExpenseActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ExpenseViewModel
     private lateinit var etExpenseName: TextInputEditText
@@ -39,6 +37,8 @@ class AddExpenseActivity : AppCompatActivity() {
     private var selectedDate: Calendar = Calendar.getInstance()
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
+    private var expenseId: Int = 0
+
     private val expenseCategories = arrayOf(
         "Food", "Transport", "Bills", "Shopping",
         "Entertainment", "Healthcare", "Education", "Other"
@@ -56,13 +56,9 @@ class AddExpenseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_expense)
 
-        // Setup status bar - dark icons for light background
         setupStatusBar()
-
-        // Initialize ViewModel
         viewModel = ViewModelProvider(this)[ExpenseViewModel::class.java]
 
-        // Initialize views
         initViews()
         setupCategorySpinner()
         setupRecurrenceSpinner()
@@ -72,16 +68,20 @@ class AddExpenseActivity : AppCompatActivity() {
         setupSaveButton()
         setupCancelButton()
 
+        supportActionBar?.title = "Edit Transaction"
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        // Load existing expense data
+        loadExpenseData()
     }
 
     private fun setupStatusBar() {
         window.statusBarColor = android.graphics.Color.TRANSPARENT
-        WindowCompat.setDecorFitsSystemWindows(window, true)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             window.insetsController?.setSystemBarsAppearance(
-                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, // Dark icons for light background
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
                 WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
             )
         } else {
@@ -105,8 +105,63 @@ class AddExpenseActivity : AppCompatActivity() {
         btnSave = findViewById(R.id.btnSave)
         btnCancel = findViewById(R.id.btnCancel)
 
-        // Set default date
+        btnSave.text = "Update"
+    }
+
+    private fun loadExpenseData() {
+        expenseId = intent.getIntExtra("expense_id", 0)
+        val name = intent.getStringExtra("expense_name") ?: ""
+        val amount = intent.getDoubleExtra("expense_amount", 0.0)
+        val category = intent.getStringExtra("expense_category") ?: ""
+        val date = intent.getLongExtra("expense_date", System.currentTimeMillis())
+        val description = intent.getStringExtra("expense_description") ?: ""
+        val type = intent.getStringExtra("expense_type") ?: "EXPENSE"
+        val isRecurring = intent.getBooleanExtra("expense_recurring", false)
+        val recurrencePeriod = intent.getStringExtra("expense_recurrence_period")
+
+        // Set values
+        etExpenseName.setText(name)
+        etAmount.setText(amount.toString())
+        etDescription.setText(description)
+
+        selectedDate.timeInMillis = date
         etDate.setText(dateFormat.format(selectedDate.time))
+
+        // Set transaction type
+        if (type == "EXPENSE") {
+            rbExpense.isChecked = true
+            setupCategorySpinner()
+        } else {
+            rbIncome.isChecked = true
+            val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, incomeCategories)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinnerCategory.adapter = adapter
+        }
+
+        // Set category
+        val categoryArray = if (type == "EXPENSE") expenseCategories else incomeCategories
+        val categoryPosition = categoryArray.indexOf(category)
+        if (categoryPosition >= 0) {
+            spinnerCategory.setSelection(categoryPosition)
+        }
+
+        // Set recurring
+        cbIsRecurring.isChecked = isRecurring
+        if (isRecurring) {
+            spinnerRecurrence.visibility = View.VISIBLE
+            tvRecurrenceLabel.visibility = View.VISIBLE
+
+            recurrencePeriod?.let {
+                val periodPosition = when(it) {
+                    "DAILY" -> 0
+                    "WEEKLY" -> 1
+                    "MONTHLY" -> 2
+                    "YEARLY" -> 3
+                    else -> 0
+                }
+                spinnerRecurrence.setSelection(periodPosition)
+            }
+        }
     }
 
     private fun setupCategorySpinner() {
@@ -168,18 +223,17 @@ class AddExpenseActivity : AppCompatActivity() {
 
     private fun setupSaveButton() {
         btnSave.setOnClickListener {
-            saveExpense()
+            updateExpense()
         }
     }
 
     private fun setupCancelButton() {
         btnCancel.setOnClickListener {
-            // Discard all input and return to MainActivity
             finish()
         }
     }
 
-    private fun saveExpense() {
+    private fun updateExpense() {
         val name = etExpenseName.text.toString().trim()
         val amountStr = etAmount.text.toString().trim()
         val category = spinnerCategory.selectedItem.toString()
@@ -226,8 +280,9 @@ class AddExpenseActivity : AppCompatActivity() {
             null
         }
 
-        // Create expense object
-        val expense = Expense(
+        // Create updated expense object with existing ID
+        val updatedExpense = Expense(
+            id = expenseId.toLong(),
             expenseName = name,
             amount = amount,
             category = category,
@@ -239,11 +294,11 @@ class AddExpenseActivity : AppCompatActivity() {
             nextDueDate = nextDueDate
         )
 
-        // Save to database
-        viewModel.insert(expense)
+        // Update in database
+        viewModel.update(updatedExpense)
 
         // Show success message
-        Toast.makeText(this, "Transaction saved successfully", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Transaction updated successfully", Toast.LENGTH_SHORT).show()
 
         // Close activity
         finish()

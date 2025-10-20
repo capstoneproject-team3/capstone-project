@@ -19,14 +19,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.graphics.Color
 
-// 👇 NEW IMPORTS FOR NOTIFICATION PERMISSION
+// Notification permission imports
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import android.widget.Toast
-// 👆 END NEW IMPORTS
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "CA"))
     private val monthFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
 
-    // 👇 NEW: Register the permissions callback
+    // Register the permissions callback
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -46,7 +45,6 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Notification permission denied. Reminders may not appear.", Toast.LENGTH_LONG).show()
             }
         }
-    // 👆 END NEW
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,9 +53,8 @@ class MainActivity : AppCompatActivity() {
         // Setup status bar - light icons for dark toolbar
         setupStatusBar()
 
-        // 👇 NEW: Check and request POST_NOTIFICATIONS permission
+        // Check and request POST_NOTIFICATIONS permission
         requestNotificationPermission()
-        // 👆 END NEW
 
         // Initialize ViewModel
         viewModel = ViewModelProvider(this)[ExpenseViewModel::class.java]
@@ -65,13 +62,14 @@ class MainActivity : AppCompatActivity() {
         // Setup UI
         setupRecyclerViews()
         setupFAB()
-        setupBillsButton() // Existing new function
+//        setupBillsButton()
+        setupRecentTransactionsNavigation()
 
         observeData()
         updateMonthDisplay()
     }
 
-    // 👇 NEW FUNCTION: Handle permission request for Android 13 (API 33) and above
+    // Handle permission request for Android 13 (API 33) and above
     private fun requestNotificationPermission() {
         // Check if the device runs Android 13 (API 33) or higher
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -82,7 +80,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    // 👆 END NEW FUNCTION
 
     private fun setupStatusBar() {
         window.statusBarColor = android.graphics.Color.TRANSPARENT
@@ -90,7 +87,7 @@ class MainActivity : AppCompatActivity() {
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             window.insetsController?.setSystemBarsAppearance(
-                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, // Enable light status bar (dark icons)
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
                 WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
             )
         } else {
@@ -103,7 +100,9 @@ class MainActivity : AppCompatActivity() {
         // Recent Transactions RecyclerView
         val rvRecentTransactions = findViewById<RecyclerView>(R.id.rvRecentTransactions)
         expenseAdapter = ExpenseAdapter(emptyList()) { expense ->
-            // Handle item click (we'll add edit/delete functionality later)
+            // When an item is clicked, open TransactionListActivity for edit/delete
+            val intent = Intent(this, TransactionListActivity::class.java)
+            startActivity(intent)
         }
         rvRecentTransactions.adapter = expenseAdapter
         rvRecentTransactions.layoutManager = LinearLayoutManager(this)
@@ -115,16 +114,38 @@ class MainActivity : AppCompatActivity() {
         rvTopCategories.layoutManager = LinearLayoutManager(this)
     }
 
-    private fun setupBillsButton() {
-        // Assuming you have added a Button with id 'btnBills' in activity_main.xml
-        val btnBills = findViewById<android.widget.Button>(R.id.btnBills)
-        btnBills.setOnClickListener {
-            // Open the new Bill List Activity
-            val intent = Intent(this, BillListActivity::class.java)
+    private fun setupRecentTransactionsNavigation() {
+        // Option 1: If you have a "View All" TextView in your layout
+        val tvViewAll = findViewById<TextView>(R.id.tvViewAllTransactions)
+        tvViewAll?.setOnClickListener {
+            val intent = Intent(this, TransactionListActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Option 2: Make the Recent Transactions header clickable
+        val tvRecentTransactions = findViewById<TextView>(R.id.tvRecentTransactionsHeader)
+        tvRecentTransactions?.setOnClickListener {
+            val intent = Intent(this, TransactionListActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Option 3: Add a click listener to the entire Recent Transactions card
+        val recentTransactionsCard = findViewById<android.view.View>(R.id.recentTransactionsCard)
+        recentTransactionsCard?.setOnClickListener {
+            val intent = Intent(this, TransactionListActivity::class.java)
             startActivity(intent)
         }
     }
 
+//    private fun setupBillsButton() {
+//        // Use safe call operator to prevent crash if button doesn't exist
+//        val btnBills = findViewById<android.widget.Button>(R.id.btnBills)
+//        btnBills?.setOnClickListener {
+//            // Open the new Bill List Activity
+//            val intent = Intent(this, BillListActivity::class.java)
+//            startActivity(intent)
+//        }
+//    }
 
     private fun setupFAB() {
         val fab = findViewById<FloatingActionButton>(R.id.fabAddExpense)
@@ -137,8 +158,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeData() {
         viewModel.getCurrentMonthExpenses().observe(this) { expenses ->
-            // Update recent transactions (show all)
-            expenseAdapter.updateExpenses(expenses)
+            // Update recent transactions (show only last 5 for preview)
+            val recentExpenses = expenses.take(5)
+            expenseAdapter.updateExpenses(recentExpenses)
 
             // Calculate and display totals
             val totalExpense = viewModel.calculateTotal(expenses, TransactionType.EXPENSE)

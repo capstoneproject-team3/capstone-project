@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:clipToPadding="false"
-    android:paddingTop="56dp">
+    android:fitsSystemWindows="true"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
