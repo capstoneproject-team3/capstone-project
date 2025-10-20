@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Personal_Finance_Tracker.iml" filepath="$PROJECT_DIR$/.idea/modules/Personal_Finance_Tracker.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Personal_Finance_Tracker.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Personal_Finance_Tracker.app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Personal_Finance_Tracker.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Personal_Finance_Tracker.app.androidTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Personal_Finance_Tracker.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Personal_Finance_Tracker.app.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Personal_Finance_Tracker.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Personal_Finance_Tracker.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/capstone-project.iml" filepath="$PROJECT_DIR$/.idea/capstone-project.iml" />
     </modules>
   </component>
 </project>

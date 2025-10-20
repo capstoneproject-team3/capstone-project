@@ -72,12 +72,14 @@ class AddExpenseActivity : AppCompatActivity() {
         setupSaveButton()
         setupCancelButton()
 
-
+        // Set action bar
+        supportActionBar?.title = "Add Transaction"
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun setupStatusBar() {
         window.statusBarColor = android.graphics.Color.TRANSPARENT
-        WindowCompat.setDecorFitsSystemWindows(window, true)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             window.insetsController?.setSystemBarsAppearance(

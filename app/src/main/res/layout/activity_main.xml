@@ -50,7 +50,6 @@
                 android:textColor="?attr/colorPrimary"
                 app:icon="@drawable/ic_notifications"
                 tools:ignore="HardcodedText" />
-
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -141,7 +140,6 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/recentTransactionsCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="80dp"
@@ -154,38 +152,13 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Header with title and View All link -->
-                    <RelativeLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:id="@+id/tvRecentTransactionsHeader"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Recent Transactions"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:layout_alignParentStart="true"
-                            android:layout_centerVertical="true" />
-
-                        <TextView
-                            android:id="@+id/tvViewAllTransactions"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="View All"
-                            android:textColor="?attr/colorPrimary"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:padding="4dp" />
-
-                    </RelativeLayout>
+                        android:text="Recent Transactions"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvRecentTransactions"
