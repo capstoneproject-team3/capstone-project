@@ -1,9 +1,20 @@
 <resources>
     <string name="app_name">Personal Finance Tracker</string>
+
     <string-array name="recurrence_options">
         <item>One-Time</item>
         <item>Weekly</item>
         <item>Monthly</item>
         <item>Yearly</item>
     </string-array>
+
+    <!-- Transaction Item Strings -->
+    <string name="transaction_name">Transaction Name</string>
+    <string name="category">Category</string>
+    <string name="date">Date</string>
+    <string name="default_amount">$0.00</string>
+    <string name="bullet_separator"> • </string>
+    <string name="recurring_transaction">Recurring transaction</string>
+    <string name="edit_transaction">Edit transaction</string>
+    <string name="delete_transaction">Delete transaction</string>
 </resources>
