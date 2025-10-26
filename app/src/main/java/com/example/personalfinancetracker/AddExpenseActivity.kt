@@ -17,6 +17,8 @@ import com.google.android.material.textfield.TextInputEditText
 import java.text.SimpleDateFormat
 import java.util.*
 import android.graphics.Color
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 
 class AddExpenseActivity : AppCompatActivity() {
@@ -38,6 +40,10 @@ class AddExpenseActivity : AppCompatActivity() {
 
     private var selectedDate: Calendar = Calendar.getInstance()
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+    // Edit mode variables
+    private var isEditMode = false
+    private var editingExpense: Expense? = null
 
     private val expenseCategories = arrayOf(
         "Food", "Transport", "Bills", "Shopping",
@@ -72,9 +78,71 @@ class AddExpenseActivity : AppCompatActivity() {
         setupSaveButton()
         setupCancelButton()
 
+        // Check if we're in edit mode
+        checkEditMode()
+
         // Set action bar
-        supportActionBar?.title = "Add Transaction"
+        supportActionBar?.title = if (isEditMode) "Edit Transaction" else "Add Transaction"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun checkEditMode() {
+        val expenseId = intent.getLongExtra("EXPENSE_ID", -1L)
+        if (expenseId != -1L) {
+            isEditMode = true
+            loadExpenseData(expenseId)
+        }
+    }
+
+    private fun loadExpenseData(expenseId: Long) {
+        lifecycleScope.launch {
+            viewModel.getExpenseById(expenseId).observe(this@AddExpenseActivity) { expense ->
+                expense?.let {
+                    editingExpense = it
+                    populateFields(it)
+                }
+            }
+        }
+    }
+
+    private fun populateFields(expense: Expense) {
+        etExpenseName.setText(expense.expenseName)
+        etAmount.setText(expense.amount.toString())
+        etDescription.setText(expense.description)
+
+        // Set date
+        selectedDate.timeInMillis = expense.date
+        etDate.setText(dateFormat.format(selectedDate.time))
+
+        // Set transaction type
+        if (expense.type == TransactionType.EXPENSE) {
+            rbExpense.isChecked = true
+            setupCategorySpinner() // Load expense categories
+        } else {
+            rbIncome.isChecked = true
+            val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, incomeCategories)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinnerCategory.adapter = adapter
+        }
+
+        // Set category
+        val categories = if (expense.type == TransactionType.EXPENSE) expenseCategories else incomeCategories
+        val categoryPosition = categories.indexOf(expense.category)
+        if (categoryPosition >= 0) {
+            spinnerCategory.setSelection(categoryPosition)
+        }
+
+        // Set recurring
+        cbIsRecurring.isChecked = expense.isRecurring
+        if (expense.isRecurring && expense.recurrencePeriod != null) {
+            val recurrencePosition = when (expense.recurrencePeriod) {
+                RecurrencePeriod.DAILY -> 0
+                RecurrencePeriod.WEEKLY -> 1
+                RecurrencePeriod.MONTHLY -> 2
+                RecurrencePeriod.YEARLY -> 3
+            }
+            spinnerRecurrence.setSelection(recurrencePosition)
+        }
     }
 
     private fun setupStatusBar() {
@@ -170,7 +238,11 @@ class AddExpenseActivity : AppCompatActivity() {
 
     private fun setupSaveButton() {
         btnSave.setOnClickListener {
-            saveExpense()
+            if (isEditMode) {
+                updateExpense()
+            } else {
+                saveExpense()
+            }
         }
     }
 
@@ -249,6 +321,78 @@ class AddExpenseActivity : AppCompatActivity() {
 
         // Close activity
         finish()
+    }
+
+    private fun updateExpense() {
+        val name = etExpenseName.text.toString().trim()
+        val amountStr = etAmount.text.toString().trim()
+        val category = spinnerCategory.selectedItem.toString()
+        val description = etDescription.text.toString().trim()
+        val isRecurring = cbIsRecurring.isChecked
+
+        // Validation
+        if (name.isEmpty()) {
+            etExpenseName.error = "Please enter a name"
+            return
+        }
+
+        if (amountStr.isEmpty()) {
+            etAmount.error = "Please enter an amount"
+            return
+        }
+
+        val amount = amountStr.toDoubleOrNull()
+        if (amount == null || amount <= 0) {
+            etAmount.error = "Please enter a valid amount"
+            return
+        }
+
+        // Determine transaction type
+        val type = if (rbExpense.isChecked) TransactionType.EXPENSE else TransactionType.INCOME
+
+        // Get recurrence period if recurring
+        val recurrencePeriod = if (isRecurring) {
+            when (spinnerRecurrence.selectedItem.toString()) {
+                "Daily" -> RecurrencePeriod.DAILY
+                "Weekly" -> RecurrencePeriod.WEEKLY
+                "Monthly" -> RecurrencePeriod.MONTHLY
+                "Yearly" -> RecurrencePeriod.YEARLY
+                else -> null
+            }
+        } else {
+            null
+        }
+
+        // Calculate next due date if recurring
+        val nextDueDate = if (isRecurring && recurrencePeriod != null) {
+            calculateNextDueDate(selectedDate.timeInMillis, recurrencePeriod)
+        } else {
+            null
+        }
+
+        // Update existing expense
+        editingExpense?.let { existingExpense ->
+            val updatedExpense = existingExpense.copy(
+                expenseName = name,
+                amount = amount,
+                category = category,
+                date = selectedDate.timeInMillis,
+                description = description,
+                type = type,
+                isRecurring = isRecurring,
+                recurrencePeriod = recurrencePeriod,
+                nextDueDate = nextDueDate
+            )
+
+            // Update in database
+            viewModel.update(updatedExpense)
+
+            // Show success message
+            Toast.makeText(this, "Transaction updated successfully", Toast.LENGTH_SHORT).show()
+
+            // Close activity
+            finish()
+        }
     }
 
     private fun calculateNextDueDate(currentDate: Long, period: RecurrencePeriod): Long {

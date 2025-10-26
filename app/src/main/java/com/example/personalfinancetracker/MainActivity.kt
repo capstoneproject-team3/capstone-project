@@ -102,9 +102,20 @@ class MainActivity : AppCompatActivity() {
     private fun setupRecyclerViews() {
         // Recent Transactions RecyclerView
         val rvRecentTransactions = findViewById<RecyclerView>(R.id.rvRecentTransactions)
-        expenseAdapter = ExpenseAdapter(emptyList()) { expense ->
-            // Handle item click (we'll add edit/delete functionality later)
-        }
+        expenseAdapter = ExpenseAdapter(
+            emptyList(),
+            onEditClick = { expense ->
+                // Open AddExpenseActivity in edit mode
+                val intent = Intent(this, AddExpenseActivity::class.java)
+                intent.putExtra("EXPENSE_ID", expense.id)
+                startActivity(intent)
+            },
+            onDeleteClick = { expense ->
+                // Delete the expense
+                viewModel.delete(expense)
+                Toast.makeText(this, "Transaction deleted", Toast.LENGTH_SHORT).show()
+            }
+        )
         rvRecentTransactions.adapter = expenseAdapter
         rvRecentTransactions.layoutManager = LinearLayoutManager(this)
 

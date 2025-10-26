@@ -19,7 +19,7 @@ interface ExpenseDao {
     fun getAllExpenses(): LiveData<List<Expense>>
 
     @Query("SELECT * FROM expenses WHERE id = :id")
-    suspend fun getExpenseById(id: Long): Expense?
+    fun getExpenseById(id: Long): LiveData<Expense?>
 
     @Query("SELECT * FROM expenses WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC")
     fun getExpensesByDateRange(startDate: Long, endDate: Long): LiveData<List<Expense>>
