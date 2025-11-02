@@ -85,6 +85,9 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
     fun delete(expense: Expense) = viewModelScope.launch {
         repository.delete(expense)
     }
+    fun getExpenseById(id: Long): LiveData<Expense?> {
+        return repository.getExpenseById(id)
+    }
 
     // --- EXISTING HELPER FUNCTIONS ---
 

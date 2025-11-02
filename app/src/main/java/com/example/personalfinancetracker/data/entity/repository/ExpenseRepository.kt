@@ -20,7 +20,7 @@ class ExpenseRepository(private val expenseDao: ExpenseDao) {
         expenseDao.delete(expense)
     }
 
-    suspend fun getExpenseById(id: Long): Expense? {
+    fun getExpenseById(id: Long): LiveData<Expense?> {
         return expenseDao.getExpenseById(id)
     }
 
