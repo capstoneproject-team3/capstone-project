@@ -11,19 +11,19 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.personalfinancetracker.data.entity.Expense
 import com.example.personalfinancetracker.data.entity.RecurrencePeriod
 import com.example.personalfinancetracker.data.entity.TransactionType
+import com.example.personalfinancetracker.viewmodel.CategoryViewModel
 import com.example.personalfinancetracker.viewmodel.ExpenseViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import java.text.SimpleDateFormat
 import java.util.*
-import android.graphics.Color
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
-
 class AddExpenseActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: ExpenseViewModel
+    private lateinit var expenseViewModel: ExpenseViewModel
+    private lateinit var categoryViewModel: CategoryViewModel
     private lateinit var etExpenseName: TextInputEditText
     private lateinit var etAmount: TextInputEditText
     private lateinit var etDate: TextInputEditText
@@ -41,15 +41,10 @@ class AddExpenseActivity : AppCompatActivity() {
     private var selectedDate: Calendar = Calendar.getInstance()
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
-    // Edit mode variables
     private var isEditMode = false
     private var editingExpense: Expense? = null
 
-    private val expenseCategories = arrayOf(
-        "Food", "Transport", "Bills", "Shopping",
-        "Entertainment", "Healthcare", "Education", "Other"
-    )
-
+    private var expenseCategories = arrayOf<String>()
     private val incomeCategories = arrayOf(
         "Salary", "Freelance", "Investment", "Gift", "Other"
     )
@@ -62,15 +57,13 @@ class AddExpenseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_expense)
 
-        // Setup status bar - dark icons for light background
         setupStatusBar()
 
-        // Initialize ViewModel
-        viewModel = ViewModelProvider(this)[ExpenseViewModel::class.java]
+        expenseViewModel = ViewModelProvider(this)[ExpenseViewModel::class.java]
+        categoryViewModel = ViewModelProvider(this)[CategoryViewModel::class.java]
 
-        // Initialize views
         initViews()
-        setupCategorySpinner()
+        loadCategoriesFromDatabase()
         setupRecurrenceSpinner()
         setupDatePicker()
         setupRecurringCheckbox()
@@ -78,12 +71,17 @@ class AddExpenseActivity : AppCompatActivity() {
         setupSaveButton()
         setupCancelButton()
 
-        // Check if we're in edit mode
         checkEditMode()
 
-        // Set action bar
         supportActionBar?.title = if (isEditMode) "Edit Transaction" else "Add Transaction"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun loadCategoriesFromDatabase() {
+        categoryViewModel.allCategories.observe(this) { categories ->
+            expenseCategories = categories.map { it.name }.toTypedArray()
+            setupCategorySpinner()
+        }
     }
 
     private fun checkEditMode() {
@@ -96,7 +94,7 @@ class AddExpenseActivity : AppCompatActivity() {
 
     private fun loadExpenseData(expenseId: Long) {
         lifecycleScope.launch {
-            viewModel.getExpenseById(expenseId).observe(this@AddExpenseActivity) { expense ->
+            expenseViewModel.getExpenseById(expenseId).observe(this@AddExpenseActivity) { expense ->
                 expense?.let {
                     editingExpense = it
                     populateFields(it)
@@ -110,14 +108,11 @@ class AddExpenseActivity : AppCompatActivity() {
         etAmount.setText(expense.amount.toString())
         etDescription.setText(expense.description)
 
-        // Set date
         selectedDate.timeInMillis = expense.date
         etDate.setText(dateFormat.format(selectedDate.time))
 
-        // Set transaction type
         if (expense.type == TransactionType.EXPENSE) {
             rbExpense.isChecked = true
-            setupCategorySpinner() // Load expense categories
         } else {
             rbIncome.isChecked = true
             val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, incomeCategories)
@@ -125,14 +120,12 @@ class AddExpenseActivity : AppCompatActivity() {
             spinnerCategory.adapter = adapter
         }
 
-        // Set category
         val categories = if (expense.type == TransactionType.EXPENSE) expenseCategories else incomeCategories
         val categoryPosition = categories.indexOf(expense.category)
         if (categoryPosition >= 0) {
             spinnerCategory.setSelection(categoryPosition)
         }
 
-        // Set recurring
         cbIsRecurring.isChecked = expense.isRecurring
         if (expense.isRecurring && expense.recurrencePeriod != null) {
             val recurrencePosition = when (expense.recurrencePeriod) {
@@ -151,7 +144,7 @@ class AddExpenseActivity : AppCompatActivity() {
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             window.insetsController?.setSystemBarsAppearance(
-                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, // Dark icons for light background
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
                 WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
             )
         } else {
@@ -175,7 +168,6 @@ class AddExpenseActivity : AppCompatActivity() {
         btnSave = findViewById(R.id.btnSave)
         btnCancel = findViewById(R.id.btnCancel)
 
-        // Set default date
         etDate.setText(dateFormat.format(selectedDate.time))
     }
 
@@ -248,7 +240,6 @@ class AddExpenseActivity : AppCompatActivity() {
 
     private fun setupCancelButton() {
         btnCancel.setOnClickListener {
-            // Discard all input and return to MainActivity
             finish()
         }
     }
@@ -260,7 +251,6 @@ class AddExpenseActivity : AppCompatActivity() {
         val description = etDescription.text.toString().trim()
         val isRecurring = cbIsRecurring.isChecked
 
-        // Validation
         if (name.isEmpty()) {
             etExpenseName.error = "Please enter a name"
             return
@@ -277,10 +267,8 @@ class AddExpenseActivity : AppCompatActivity() {
             return
         }
 
-        // Determine transaction type
         val type = if (rbExpense.isChecked) TransactionType.EXPENSE else TransactionType.INCOME
 
-        // Get recurrence period if recurring
         val recurrencePeriod = if (isRecurring) {
             when (spinnerRecurrence.selectedItem.toString()) {
                 "Daily" -> RecurrencePeriod.DAILY
@@ -293,14 +281,12 @@ class AddExpenseActivity : AppCompatActivity() {
             null
         }
 
-        // Calculate next due date if recurring
         val nextDueDate = if (isRecurring && recurrencePeriod != null) {
             calculateNextDueDate(selectedDate.timeInMillis, recurrencePeriod)
         } else {
             null
         }
 
-        // Create expense object
         val expense = Expense(
             expenseName = name,
             amount = amount,
@@ -313,13 +299,10 @@ class AddExpenseActivity : AppCompatActivity() {
             nextDueDate = nextDueDate
         )
 
-        // Save to database
-        viewModel.insert(expense)
+        expenseViewModel.insert(expense)
 
-        // Show success message
         Toast.makeText(this, "Transaction saved successfully", Toast.LENGTH_SHORT).show()
 
-        // Close activity
         finish()
     }
 
@@ -330,7 +313,6 @@ class AddExpenseActivity : AppCompatActivity() {
         val description = etDescription.text.toString().trim()
         val isRecurring = cbIsRecurring.isChecked
 
-        // Validation
         if (name.isEmpty()) {
             etExpenseName.error = "Please enter a name"
             return
@@ -347,10 +329,8 @@ class AddExpenseActivity : AppCompatActivity() {
             return
         }
 
-        // Determine transaction type
         val type = if (rbExpense.isChecked) TransactionType.EXPENSE else TransactionType.INCOME
 
-        // Get recurrence period if recurring
         val recurrencePeriod = if (isRecurring) {
             when (spinnerRecurrence.selectedItem.toString()) {
                 "Daily" -> RecurrencePeriod.DAILY
@@ -363,14 +343,12 @@ class AddExpenseActivity : AppCompatActivity() {
             null
         }
 
-        // Calculate next due date if recurring
         val nextDueDate = if (isRecurring && recurrencePeriod != null) {
             calculateNextDueDate(selectedDate.timeInMillis, recurrencePeriod)
         } else {
             null
         }
 
-        // Update existing expense
         editingExpense?.let { existingExpense ->
             val updatedExpense = existingExpense.copy(
                 expenseName = name,
@@ -384,13 +362,10 @@ class AddExpenseActivity : AppCompatActivity() {
                 nextDueDate = nextDueDate
             )
 
-            // Update in database
-            viewModel.update(updatedExpense)
+            expenseViewModel.update(updatedExpense)
 
-            // Show success message
             Toast.makeText(this, "Transaction updated successfully", Toast.LENGTH_SHORT).show()
 
-            // Close activity
             finish()
         }
     }
