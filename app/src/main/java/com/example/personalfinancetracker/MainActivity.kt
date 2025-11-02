@@ -125,7 +125,6 @@ class MainActivity : AppCompatActivity() {
         rvTopCategories.adapter = categoryAdapter
         rvTopCategories.layoutManager = LinearLayoutManager(this)
     }
-
     //Setup Reports Button
     private fun setupReportsButton() {
         // Assuming you have added a Button with id 'btnReports' in activity_main.xml
