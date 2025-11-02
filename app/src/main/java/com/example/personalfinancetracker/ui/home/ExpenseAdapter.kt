@@ -1,6 +1,5 @@
 package com.example.personalfinancetracker.ui.home
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +20,12 @@ class ExpenseAdapter(
 ) : RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder>() {
 
     private val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-    private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "CA"))
+    private val currencyFormat = NumberFormat.getCurrencyInstance(
+        Locale.Builder()
+            .setLanguage("en")
+            .setRegion("CA")
+            .build()
+    )
 
     class ExpenseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvTransactionName: TextView = itemView.findViewById(R.id.tvTransactionName)

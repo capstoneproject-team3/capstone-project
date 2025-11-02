@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="12dp"
+        android:baselineAligned="false">
 
         <!-- Transaction Info Section -->
         <LinearLayout
@@ -32,7 +33,7 @@
                     android:id="@+id/tvTransactionName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Transaction Name"
+                    android:text="@string/transaction_name"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="@android:color/black" />
@@ -43,7 +44,8 @@
                     android:layout_height="16dp"
                     android:layout_marginStart="8dp"
                     android:src="@android:drawable/ic_popup_reminder"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:contentDescription="@string/recurring_transaction" />
 
             </LinearLayout>
 
@@ -58,14 +60,14 @@
                     android:id="@+id/tvTransactionCategory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Category"
+                    android:text="@string/category"
                     android:textSize="14sp"
                     android:textColor="@android:color/darker_gray" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" • "
+                    android:text="@string/bullet_separator"
                     android:textSize="14sp"
                     android:textColor="@android:color/darker_gray" />
 
@@ -73,7 +75,7 @@
                     android:id="@+id/tvTransactionDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Date"
+                    android:text="@string/date"
                     android:textSize="14sp"
                     android:textColor="@android:color/darker_gray" />
 
@@ -85,7 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="$0.00"
+                android:text="@string/default_amount"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -105,7 +107,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_menu_edit"
                 app:tint="@color/black"
-                android:contentDescription="Edit" />
+                android:contentDescription="@string/edit_transaction" />
 
             <ImageButton
                 android:id="@+id/btnDelete"
@@ -115,7 +117,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_menu_delete"
                 app:tint="@android:color/holo_red_light"
-                android:contentDescription="Delete" />
+                android:contentDescription="@string/delete_transaction" />
 
         </LinearLayout>
 
