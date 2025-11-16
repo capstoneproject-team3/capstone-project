@@ -42,6 +42,11 @@
             android:label="Add Recurring Bill"
             android:parentActivityName=".BillListActivity">
         </activity>
+        <activity
+            android:name=".BudgetManagementActivity"
+            android:label="Budget Management"
+            android:parentActivityName=".SettingsActivity">
+        </activity>
 
         <activity
             android:name=".ReportActivity"

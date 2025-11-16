@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.personalfinancetracker.data.entity.viewmodel.BillViewModel
+import com.example.personalfinancetracker.viewmodel.BillViewModel
 import com.example.personalfinancetracker.databinding.ActivityBillListBinding
 import com.example.personalfinancetracker.ui.home.BillAdapter
 

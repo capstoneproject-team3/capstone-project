@@ -1,4 +1,4 @@
-package com.example.personalfinancetracker.data.entity.viewmodel
+package com.example.personalfinancetracker.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.personalfinancetracker.data.entity.Bill
-import com.example.personalfinancetracker.data.entity.viewmodel.BillViewModel
+import com.example.personalfinancetracker.viewmodel.BillViewModel
 import com.example.personalfinancetracker.databinding.ActivityAddBillBinding
 import java.text.SimpleDateFormat
 import java.util.*

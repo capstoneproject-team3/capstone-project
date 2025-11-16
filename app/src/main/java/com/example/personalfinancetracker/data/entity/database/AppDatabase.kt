@@ -9,7 +9,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.personalfinancetracker.data.dao.CategoryDao
 import com.example.personalfinancetracker.data.dao.ExpenseDao
 import com.example.personalfinancetracker.data.entity.dao.BillDao
+import com.example.personalfinancetracker.data.entity.dao.BudgetDao
 import com.example.personalfinancetracker.data.entity.Bill
+import com.example.personalfinancetracker.data.entity.Budget
 import com.example.personalfinancetracker.data.entity.Category
 import com.example.personalfinancetracker.data.entity.Expense
 import kotlinx.coroutines.CoroutineScope
@@ -17,8 +19,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [Expense::class, Bill::class, Category::class],
-    version = 3,
+    entities = [Expense::class, Bill::class, Category::class, Budget::class],
+    version = 5,  // Incremented version
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -26,6 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
     abstract fun billDao(): BillDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun budgetDao(): BudgetDao
 
     companion object {
         @Volatile
@@ -61,11 +64,6 @@ abstract class AppDatabase : RoomDatabase() {
             val defaultCategories = listOf(
                 Category(name = "Food", isDefault = true),
                 Category(name = "Transport", isDefault = true),
-                Category(name = "Bills", isDefault = true),
-                Category(name = "Shopping", isDefault = true),
-                Category(name = "Entertainment", isDefault = true),
-                Category(name = "Healthcare", isDefault = true),
-                Category(name = "Education", isDefault = true),
                 Category(name = "Other", isDefault = true)
             )
             defaultCategories.forEach { categoryDao.insert(it) }
